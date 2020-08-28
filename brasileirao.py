@@ -301,6 +301,7 @@ def data_de_um_jogo(dados, id_jogo):
             return(dados['fases']['2700']['jogos']['id'][id_par]['data'])
     return('nao encontrado')
 
+
 '''
 Agora, façamos uma busca "fuzzy". Queremos procurar por 'Fla'
 e achar o flamengo. Ou por 'Paulo' e achar o são paulo.
@@ -317,8 +318,17 @@ com a pesquisa (e pode ser vazia, se não achar ninguém)
 
 
 def busca_imprecisa_por_nome_de_time(dados, nome_time):
-    pass
-
+    lista = []
+    for i in dados['equipes']:
+        nome_comum = dados['equipes'][i]['nome-comum']
+        nome_slug = dados['equipes'][i]['nome-slug']
+        sigla = dados['equipes'][i]['sigla']
+        nome = dados['equipes'][i]['nome']
+        busca = format(nome_time in nome or nome_time in nome_slug or nome_time in sigla or nome_time in nome_comum)
+        if busca:
+            lista.append(id_do_time(dados, nome_comum))
+        
+        return lista
 # ids dos jogos de um time
 
 
@@ -409,33 +419,33 @@ except:
 class TestClientes(unittest.TestCase):
 
     def test_000_nome_do_time(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(nome_do_time(dados, '1'), 'Flamengo')
         self.assertEqual(nome_do_time(dados, '695'), 'Chapecoense')
 
     def test_001_id_campeao(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(id_campeao(dados), '17')
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
         dados['fases']['2700']['classificacao']['grupo']['Único'].pop(0)
         self.assertEqual(id_campeao(dados), '1')
 
     def test_002_nome_campeao(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(nome_campeao(dados), 'Palmeiras')
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
         dados['fases']['2700']['classificacao']['grupo']['Único'].pop(0)
         self.assertEqual(nome_campeao(dados), 'Flamengo')
 
     def test_003_qtos_libertadores(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(qtos_libertadores(dados), 6)
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa']='1-8'
+        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa'] = '1-8'
         self.assertEqual(qtos_libertadores(dados), 8)
 
     def test_004_ids_dos_melhor_classificados(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(ids_dos_melhor_classificados(dados, 10), [
                          "17", "1", "15", "13", "24", "4", "3", "9", "5", "22"])
         self.assertEqual(ids_dos_melhor_classificados(
@@ -444,142 +454,142 @@ class TestClientes(unittest.TestCase):
             dados, 3), ["17", "1", "15"])
 
     def test_005_classificados_libertadores(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(classificados_libertadores(dados),
                          ["17", "1", "15", "13", "24", "4"])
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa']='1-8'
+        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa'] = '1-8'
         self.assertEqual(classificados_libertadores(dados), [
                          "17", "1", "15", "13", "24", "4", "3", "9"])
 
     def test_006_nomes_classificados_libertadores(self):
-        dados=pega_dados()
+        dados = pega_dados()
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa']='1-3'
+        dados['fases']['2700']['faixas-classificacao']['classifica1']['faixa'] = '1-3'
         self.assertEqual(nomes_classificados_libertadores(dados), [
                          "Palmeiras", "Flamengo", "Internacional"])
 
     def test_007_ids_dos_times_de_um_jogo(self):
-        dados=pega_dados()
-        t1, t2=ids_dos_times_de_um_jogo(dados, '102099')
+        dados = pega_dados()
+        t1, t2 = ids_dos_times_de_um_jogo(dados, '102099')
         self.assertTrue(t1 in ['5', '17'])
         self.assertTrue(t2 in ['5', '17'])
-        t1, t2=ids_dos_times_de_um_jogo(dados, '102109')
+        t1, t2 = ids_dos_times_de_um_jogo(dados, '102109')
         self.assertTrue(t1 in ['1', '26'])
         self.assertTrue(t2 in ['1', '26'])
 
     def test_008_nomes_dos_times_de_um_jogo(self):
-        dados=pega_dados()
-        t1, t2=nomes_dos_times_de_um_jogo(dados, '102099')
+        dados = pega_dados()
+        t1, t2 = nomes_dos_times_de_um_jogo(dados, '102099')
         self.assertTrue(t1 in ['Botafogo', 'Palmeiras'])
         self.assertTrue(t2 in ['Botafogo', 'Palmeiras'])
-        t1, t2=nomes_dos_times_de_um_jogo(dados, '102106')
+        t1, t2 = nomes_dos_times_de_um_jogo(dados, '102106')
         self.assertTrue(t1 in ['Chapecoense', 'Vasco'])
         self.assertTrue(t2 in ['Chapecoense', 'Vasco'])
 
     def test_009_id_do_time(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(id_do_time(dados, 'Cruzeiro'), '9')
         self.assertEqual(id_do_time(dados, 'Athletico'), '3')
 
     def test_010_dicionario_id_estadio_e_nro_jogos(self):
-        dados=pega_dados()
-        estadios=dicionario_id_estadio_e_nro_jogos(dados)
+        dados = pega_dados()
+        estadios = dicionario_id_estadio_e_nro_jogos(dados)
         self.assertEqual(estadios['72'], 16)
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['jogos']['id']['102097']['estadio_id']='72'
-        estadios=dicionario_id_estadio_e_nro_jogos(dados)
+        dados['fases']['2700']['jogos']['id']['102097']['estadio_id'] = '72'
+        estadios = dicionario_id_estadio_e_nro_jogos(dados)
         self.assertEqual(estadios['72'], 17)
 
     def test_011_datas_de_jogo(self):
-        dados=pega_dados()
-        datas=datas_de_jogo(dados)
+        dados = pega_dados()
+        datas = datas_de_jogo(dados)
         self.assertEqual(len(datas), 107)
         self.assertTrue('2018-04-14' in datas)
         self.assertTrue('2018-07-26' in datas)
         self.assertTrue('2018-10-26' in datas)
 
     def test_012_datas_de_jogo_teste_2(self):
-        dados=pega_dados()
+        dados = pega_dados()
         del dados['fases']['2700']['jogos']['data']['2018-04-14']
-        datas=datas_de_jogo(dados)
+        datas = datas_de_jogo(dados)
         self.assertEqual(len(datas), 106)
         self.assertFalse('2018-04-14' in datas)
         self.assertTrue('2018-07-26' in datas)
         self.assertTrue('2018-10-26' in datas)
 
     def test_013_data_de_um_jogo(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(data_de_um_jogo(dados, '102132'), '2018-05-06')
         self.assertEqual(data_de_um_jogo(dados, '102187'), '2018-06-06')
         self.assertEqual(data_de_um_jogo(dados, '102540'), 'nao encontrado')
 
     def test_014_busca_imprecisa_por_nome_de_time(self):
-        dados=pega_dados()
-        ids_times=busca_imprecisa_por_nome_de_time(dados, 'Paulo')
+        dados = pega_dados()
+        ids_times = busca_imprecisa_por_nome_de_time(dados, 'Paulo')
         self.assertTrue('24' in ids_times)
-        ids_times=busca_imprecisa_por_nome_de_time(dados, 'SPA')
+        ids_times = busca_imprecisa_por_nome_de_time(dados, 'SPA')
         self.assertTrue('24' in ids_times)
-        ids_times=busca_imprecisa_por_nome_de_time(dados, 'anto')
+        ids_times = busca_imprecisa_por_nome_de_time(dados, 'anto')
         self.assertTrue('22' in ids_times)
 
     def test_015_ids_de_jogos_de_um_time(self):
-        dados=pega_dados()
-        jogos_chapeco=ids_de_jogos_de_um_time(dados, '695')
+        dados = pega_dados()
+        jogos_chapeco = ids_de_jogos_de_um_time(dados, '695')
         self.assertEqual(len(jogos_chapeco), 38)
         self.assertTrue('102330' in jogos_chapeco)
         self.assertTrue('102422' in jogos_chapeco)
-        jogos_santos=ids_de_jogos_de_um_time(dados, '22')
+        jogos_santos = ids_de_jogos_de_um_time(dados, '22')
         self.assertEqual(len(jogos_santos), 38)
         self.assertTrue('102208' in jogos_santos)
         self.assertTrue('102259' in jogos_santos)
 
     def test_016_datas_de_jogos_de_um_time(self):
-        dados=pega_dados()
-        datas_santos=datas_de_jogos_de_um_time(dados, 'Santos')
+        dados = pega_dados()
+        datas_santos = datas_de_jogos_de_um_time(dados, 'Santos')
         self.assertEqual(len(datas_santos), 38)
         self.assertTrue('2018-04-21' in datas_santos)
         self.assertTrue('2018-10-13' in datas_santos)
-        datas_chapeco=datas_de_jogos_de_um_time(dados, 'Chapecoense')
+        datas_chapeco = datas_de_jogos_de_um_time(dados, 'Chapecoense')
         self.assertEqual(len(datas_chapeco), 38)
         self.assertTrue('2018-11-25' in datas_chapeco)
         self.assertTrue('2018-12-02' in datas_chapeco)
 
     def test_017_dicionario_de_gols(self):
-        dados=pega_dados()
-        dic_gols=dicionario_de_gols(dados)
+        dados = pega_dados()
+        dic_gols = dicionario_de_gols(dados)
 
         self.assertEqual(dic_gols['695'], 34)
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['jogos']['id']['102330']['placar2']=1
-        dic_gols=dicionario_de_gols(dados)
+        dados['fases']['2700']['jogos']['id']['102330']['placar2'] = 1
+        dic_gols = dicionario_de_gols(dados)
         self.assertEqual(dic_gols['695'], 35)
-        dados['fases']['2700']['jogos']['id']['102422']['placar2']=2
-        dic_gols=dicionario_de_gols(dados)
+        dados['fases']['2700']['jogos']['id']['102422']['placar2'] = 2
+        dic_gols = dicionario_de_gols(dados)
         self.assertEqual(dic_gols['695'], 36)
-        dados['fases']['2700']['jogos']['id']['102422']['placar2']=12
-        dic_gols=dicionario_de_gols(dados)
+        dados['fases']['2700']['jogos']['id']['102422']['placar2'] = 12
+        dic_gols = dicionario_de_gols(dados)
         self.assertEqual(dic_gols['695'], 46)
 
     def test_018_time_que_fez_mais_gols(self):
-        dados=pega_dados()
-        time=time_que_fez_mais_gols(dados)
+        dados = pega_dados()
+        time = time_que_fez_mais_gols(dados)
         self.assertEqual(time, '17')
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['jogos']['id']['102422']['placar2']=120
-        time=time_que_fez_mais_gols(dados)
+        dados['fases']['2700']['jogos']['id']['102422']['placar2'] = 120
+        time = time_que_fez_mais_gols(dados)
         self.assertEqual(time, '695')
 
     def test_019_rebaixados(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(rebaixados(dados), ['76', '26', '21', '18'])
         # vou falsificar os dados pra testar se vc esta lendo direito da estrutura
-        dados['fases']['2700']['faixas-classificacao']['classifica3']['faixa']='15-20'
+        dados['fases']['2700']['faixas-classificacao']['classifica3']['faixa'] = '15-20'
         self.assertEqual(rebaixados(dados), [
                          '33', '25', '76', '26', '21', '18'])
 
     def test_020_classificacao_do_time_por_id(self):
-        dados=pega_dados()
+        dados = pega_dados()
         self.assertEqual(classificacao_do_time_por_id(dados, '17'), 1)
         self.assertEqual(classificacao_do_time_por_id(dados, '30'), 11)
         self.assertEqual(classificacao_do_time_por_id(dados, '695'), 14)
@@ -588,17 +598,17 @@ class TestClientes(unittest.TestCase):
 
 
 def runTests():
-    suite=unittest.defaultTestLoader.loadTestsFromTestCase(TestClientes)
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestClientes)
     unittest.TextTestRunner(verbosity=2, failfast=True).run(suite)
 
 
 def pega_dados():
     with open('ano2018.json') as f:
-        dados=json.load(f)
+        dados = json.load(f)
     return dados
 
 
-dados2018=pega_dados()
+dados2018 = pega_dados()
 
 if __name__ == '__main__':
     runTests()
