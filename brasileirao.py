@@ -326,9 +326,9 @@ def busca_imprecisa_por_nome_de_time(dados, nome_time):
         nome = dados['equipes'][i]['nome']
         busca = format(nome_time in nome or nome_time in nome_slug or nome_time in sigla or nome_time in nome_comum)
         if busca:
-            lista.append(id_do_time(dados, nome_comum))
-        
-        return lista
+            lista.append(i)
+    return lista
+
 # ids dos jogos de um time
 
 
