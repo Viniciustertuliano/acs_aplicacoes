@@ -324,7 +324,8 @@ def busca_imprecisa_por_nome_de_time(dados, nome_time):
         nome_slug = dados['equipes'][i]['nome-slug']
         sigla = dados['equipes'][i]['sigla']
         nome = dados['equipes'][i]['nome']
-        busca = format(nome_time in nome or nome_time in nome_slug or nome_time in sigla or nome_time in nome_comum)
+        busca = format(
+            nome_time in nome or nome_time in nome_slug or nome_time in sigla or nome_time in nome_comum)
         if busca:
             lista.append(i)
     return lista
@@ -339,7 +340,14 @@ e retornar as ids de todos os jogos em que ele participou
 
 
 def ids_de_jogos_de_um_time(dados, time_id):
-    pass
+    lista = []
+    id_jogos = dados['fases']['2700']['jogos']['id']
+    for i in id_jogos:
+        if id_jogos[i]['time1'] == time_id:
+            lista.append(i)
+        if id_jogos[i]['time2'] == time_id:
+            lista.append(i)
+    return lista
 
 
 '''
@@ -353,7 +361,15 @@ Ela retorna uma lista das datas em que o time jogou
 
 
 def datas_de_jogos_de_um_time(dados, nome_time):
-    pass
+    lista = []
+    for i in dados['equipes']:
+        nome_comum = dados['equipes'][i]['nome-comum']
+        if nome_comum == nome_time:
+            id = i
+    id_jogo = ids_de_jogos_de_um_time(dados, id)
+    for x in id_jogo:
+        lista.append(dados['fases']['2700']['jogos']['id'][x]['data'])
+    return lista
 
 
 '''
@@ -367,7 +383,24 @@ e o valor associado ao '17' é o numero de gols total que o palmeiras fez.
 
 
 def dicionario_de_gols(dados):
-    pass
+    dicionario = {}
+    id_jogos = dados['fases']['2700']['jogos']['id']
+    for i in id_jogos:
+        time1 = dados['fases']['2700']['jogos']['id'][i]['time1']
+        time2 = dados['fases']['2700']['jogos']['id'][i]['time2']
+        placar1 = int(dados['fases']['2700']['jogos']['id'][i]['placar1'])
+        placar2 = int(dados['fases']['2700']['jogos']['id'][i]['placar2'])
+        if time1 not in dicionario:
+            dicionario[time1] = placar1
+        else:
+            dicionario[time1] += placar1
+
+        if time2 not in dicionario:
+            dicionario[time2] = placar2
+        else:
+            dicionario[time2] += placar2
+
+    return dicionario
 
 
 '''
@@ -378,7 +411,13 @@ Ela devolve a id do time que fez mais gols no campeonato
 
 
 def time_que_fez_mais_gols(dados):
-    pass
+    dic = dicionario_de_gols(dados)
+    lista = []
+    for i in dic:
+        lista.append(dic[i])
+        if max(lista) == dic[i]:
+            time = i
+    return time
 
 
 '''
@@ -394,7 +433,15 @@ ela chumbada da função
 
 
 def rebaixados(dados):
-    pass
+    faixa_inicio = int(dados['fases']['2700']['faixas-classificacao']
+                       ['classifica3']['faixa'].split('-')[0])
+    faixa_fim = int(dados['fases']['2700']['faixas-classificacao']
+                    ['classifica3']['faixa'].split('-')[1])
+    ids = []
+    for id in range(faixa_inicio-1, faixa_fim, 1):
+        num_id = dados['fases']['2700']['classificacao']['grupo']['Único'][id]
+        ids.append(num_id)
+    return ids
 
 
 '''
@@ -407,7 +454,14 @@ Se a id nao for valida, ela retorna a string 'nao encontrado'
 
 
 def classificacao_do_time_por_id(dados, time_id):
-    pass
+    id = dados['fases']['2700']['classificacao']['grupo']['Único']
+    cont = 0
+    while cont < len(id):
+        if int(id[cont]) == int(time_id):
+            return cont+1
+        cont += 1
+        if time_id not in id:
+            return 'nao encontrado'
 
 
 try:
