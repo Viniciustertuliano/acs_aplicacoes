@@ -163,7 +163,42 @@ Se houver dois tipos, a ordem não é importante.
 
 
 def tipos_do_pokemon(nome):
-    pass
+    dic_tipo = {"normal": "normal",
+                "fighting": "lutador",
+                "flying": "voador",
+                "poison": "veneno",
+                "ground": "terra",
+                "rock": "pedra",
+                "bug": "inseto",
+                "ghost": "fantasma",
+                "steel": "aço",
+                "fairy": "fada",
+                "water": "água",
+                "grass": "grama",
+                "fire": "fogo",
+                "electric": "elétrico",
+                "psychic": "psíquico",
+                "ice": "gelo",
+                "dragon": "dragão",
+                "dark": "noturno"
+                }
+
+    r = requests.get(
+        f"https://pokeapi.co/api/v2/pokemon/{str(nome).lower()}/")
+
+    if r.status_code != 200:
+        raise PokemonNaoExisteException
+    else:
+
+        dic = r.json()
+        n = 0
+        lista = []
+        for i in range(len(dic['types'])):
+            x = dic['types'][n]['type']['name']
+            lista.append(dic_tipo[x])
+            n += 1
+
+    return lista
 
 
 """
@@ -174,7 +209,19 @@ Retorne None se o pokémon não tem evolução anterior. Por exemplo, evolucao_a
 
 
 def evolucao_anterior(nome):
-    pass
+    r = requests.get(
+        f"https://pokeapi.co/api/v2/pokemon-species/{str(nome).lower()}/")
+
+    if r.status_code != 200:
+        raise PokemonNaoExisteException
+
+    dic = r.json()
+
+    if dic['evolves_from_species'] is None:
+        return None
+
+    if dic['evolves_from_species']['name']:
+        return dic['evolves_from_species']['name']
 
 
 """
@@ -189,7 +236,26 @@ Se o pokémon não evolui, retorne uma lista vazia. Por exemplo, evolucoes_proxi
 
 
 def evolucoes_proximas(nome):
-    pass
+    id = numero_do_pokemon(nome)
+
+    r = requests.get(
+        f"https://pokeapi.co/api/v2/pokemon-species/{str(nome).lower()}/")
+
+    dic = r.json()
+
+    if r.status_code != 200:
+        raise PokemonNaoExisteException
+    else:
+        lista = []
+
+        url = dic['evolution_chain']['url']
+        r2 = requests.get(url)
+        dic2 = r2.json()
+
+        for i in range(len(dic2['chain']['evolves_to'])):
+            x = dic2['chain']['evolves_to'][0]['species']['name']
+            lista.append(x)
+    return lista
 
 
 """

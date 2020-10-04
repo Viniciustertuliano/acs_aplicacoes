@@ -5,6 +5,7 @@ from pokemon_teste_base import *
 verificar_online("pokeapi")
 
 class TestPokeapi(unittest.TestCase):
+
     @sem_io
     def test_01a_ok(self):
         self.assertEqual(nome_do_pokemon(1), "bulbasaur")
