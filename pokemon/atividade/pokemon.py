@@ -253,11 +253,15 @@ def evolucoes_proximas(nome):
         dic2 = r2.json()
 
         for i in range(len(dic2['chain']['evolves_to'])):
-            x = dic2['chain']['evolves_to'][0]['species']['name']
-            lista.append(x)
+            x = dic2['chain']['evolves_to'][i]['species']['name']
+            if x != nome:
+                lista.append(x)
+            else:
+                y = dic2['chain']['evolves_to'][0]['evolves_to'][0]['species']['name']
+                lista.append(y)
     return lista
 
-
+print(evolucoes_proximas("charmeleon"))
 """
 8. A medida que ganham pontos de experiência, os pokémons sobem de nível.
 É possível determinar o nível (1 a 100) em que um pokémon se encontra com base na quantidade de pontos de experiência que ele tem.

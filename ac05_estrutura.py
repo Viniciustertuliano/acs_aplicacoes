@@ -51,11 +51,25 @@ class TabelaDispersao:
                     return True
         return False
 
-def fator_de_carga(self):
-    pass
+    def fator_de_carga(self):
+        pass
 
-def eh_primo(self, numero):
-    pass
+    def eh_primo(self, numero):
+        if numero == 2 or (numero != 1 and numero % 2 == 1):
+            primo = True
+        else:
+            primo = False
 
-def redimensionar(self, novo_tamanho, tamanho_primo):
-    pass
+        divisor = 3
+        while divisor < numero // 2 and primo:
+            if numero % divisor == 0:
+                primo = False
+            divisor += 2
+
+        if primo:
+            return True
+        else:
+            return False
+
+    def redimensionar(self, novo_tamanho, tamanho_primo):
+        pass
